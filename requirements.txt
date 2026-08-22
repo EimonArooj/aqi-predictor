@@ -5,6 +5,5 @@ joblib
 python-dotenv
 scikit-learn
 pyarrow
-confluent-kafka
 shap
 matplotlib
