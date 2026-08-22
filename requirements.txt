@@ -1,9 +1,9 @@
 streamlit
 pandas
-hopsworks
+hopsworks>=4.0,<6.0
 joblib
 python-dotenv
 scikit-learn
 pyarrow
 shap
-matplotlib
+matplotlib>=3.8
