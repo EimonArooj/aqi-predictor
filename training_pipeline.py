@@ -9,6 +9,7 @@ from sklearn.linear_model import Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import numpy as np
+import joblib
 
 load_dotenv()
 
@@ -107,3 +108,21 @@ print("\n--- Random Forest Results ---")
 print("RMSE:", round(rf_rmse, 2))
 print("MAE:", round(rf_mae, 2))
 print("R²:", round(rf_r2, 3))
+
+# ---- Save the trained model locally first ----
+os.makedirs("model_output", exist_ok=True)
+model_path = "model_output/rf_model.pkl"
+joblib.dump(rf_model, model_path)
+print("Model saved locally at:", model_path)
+
+# ---- Push model to Hopsworks Model Registry ----
+mr = project.get_model_registry()
+
+rf_hopsworks_model = mr.python.create_model(
+    name="aqi_rf_model",
+    metrics={"rmse": rf_rmse, "mae": rf_mae, "r2": rf_r2},
+    description="Random Forest model for 3-day-ahead AQI forecasting (Rawalpindi)"
+)
+
+rf_hopsworks_model.save(model_path)
+print("Model pushed to Hopsworks Model Registry successfully!")

@@ -1,0 +1,8 @@
+streamlit
+pandas
+hopsworks
+joblib
+python-dotenv
+scikit-learn
+pyarrow
+confluent-kafka
