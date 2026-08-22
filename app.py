@@ -5,7 +5,8 @@ import joblib
 from dotenv import load_dotenv
 import hopsworks
 from datetime import datetime
-
+import shap
+import matplotlib.pyplot as plt
 load_dotenv()
 
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
@@ -98,3 +99,27 @@ elif prediction > 100:
     st.warning(f"{emoji} **Predicted AQI: {category}** ({round(prediction)}). Sensitive groups should take precautions.")
 else:
     st.success(f"{emoji} **Predicted AQI: {category}** ({round(prediction)}). Air quality looks acceptable.")
+    # ---- SHAP Explanation ----
+st.subheader("🔍 Why this prediction?")
+
+@st.cache_resource
+def get_shap_explainer(_model):
+    return shap.TreeExplainer(_model)
+
+explainer = get_shap_explainer(rf_model)
+shap_values = explainer.shap_values(X_latest)
+
+feature_names = feature_columns
+shap_df = pd.DataFrame({
+    "Feature": feature_names,
+    "Impact": shap_values[0]
+}).sort_values("Impact", key=abs, ascending=True)
+
+fig, ax = plt.subplots(figsize=(8, 4))
+colors = ["#ff4b4b" if x > 0 else "#4b8bff" for x in shap_df["Impact"]]
+ax.barh(shap_df["Feature"], shap_df["Impact"], color=colors)
+ax.set_xlabel("Impact on Predicted AQI")
+ax.set_title("Feature Contributions to This Prediction")
+st.pyplot(fig)
+
+st.caption("🔴 Red bars increase the predicted AQI. 🔵 Blue bars decrease it.")
