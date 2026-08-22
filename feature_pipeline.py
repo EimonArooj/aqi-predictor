@@ -55,6 +55,8 @@ weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={LAT}&lon={L
 weather_response = requests.get(weather_url)
 weather_data = weather_response.json()
 
+print("Weather API raw response:", weather_data)  # TEMPORARY DEBUG LINE
+
 temperature = weather_data["main"]["temp"]
 humidity = weather_data["main"]["humidity"]
 pressure = weather_data["main"]["pressure"]
